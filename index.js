@@ -1,20 +1,19 @@
-
 const express = require("express");
 const app = express();
 let morgan = require("morgan");
-const cors = require('cors')
-
+const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
+  console.log("Method: ", request.method);
   console.log("Path:  ", request.path);
   console.log("Body:  ", request.body);
   console.log("---");
   next();
 };
 
-app.use(cors())
+app.use(express.static("build"));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(requestLogger);
 app.use(morgan("tiny"));
@@ -61,16 +60,15 @@ app.get("/api/persons/:id", (req, res) => {
   person ? res.json(person) : res.status(404).end();
 });
 
-app.delete("api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res) => {
+  console.log("poistettava id: ");
   const id = Number(req.params.id);
-  console.log("poistettava id: ", id);
   persons = persons.filter(person => person.id !== id);
   res.status(204).end();
 });
 
-app.post("api/persons/", (req, res) => {
+app.post("/api/persons/", (req, res) => {
   const body = req.body;
-  console.log(body);
 
   if (!body.name || !body.number) {
     return res.status(400).json({
@@ -85,10 +83,12 @@ app.post("api/persons/", (req, res) => {
     }
   });
 
-  console.log(req.headers);
   const id = Math.floor(Math.random() * 1000);
+
   const personToAdd = { ...body, id: id };
-  persons.concat(personToAdd);
+
+  persons = persons.concat(personToAdd);
+  console.log(persons);
   res.json(persons);
   // res.send(`<h2>New contact added: ${personToAdd.name} </h2>`);
 });
@@ -98,7 +98,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
