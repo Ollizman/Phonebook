@@ -28,16 +28,6 @@ let persons = [
     id: 2,
     name: "Olli Manninen",
     number: "0506976455"
-  },
-  {
-    id: 3,
-    name: "Jussi Pupunen",
-    number: "0401234567"
-  },
-  {
-    id: 4,
-    name: "Jorma Uotila",
-    number: "0449876543"
   }
 ];
 
@@ -55,13 +45,12 @@ app.get("/info", (req, res) => {
 
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
+  console.log(id)
   const person = persons.find(person => person.id === id);
-  console.log(id, typeof id, person.id, typeof person.id);
   person ? res.json(person) : res.status(404).end();
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  console.log("poistettava id: ");
   const id = Number(req.params.id);
   persons = persons.filter(person => person.id !== id);
   res.status(204).end();
@@ -74,16 +63,21 @@ app.post("/api/persons/", (req, res) => {
     return res.status(400).json({
       error: "name or number missing"
     });
-  }
+  } 
   persons.map(person => {
+    //!selvitettävää! 
+    //testissä tulee ilmoitus, mutta nimi lisätään kuitenkin listaan
+    //eli return ei tässä pysäytä metodin jatkamista...
     if (person.name === body.name) {
       return res.status(400).json({
         error: "name is already in Phonebook"
       });
     }
-  });
+  })
+  
 
-  const id = Math.floor(Math.random() * 1000);
+
+  const id = Math.floor(Math.random() * 10000);
 
   const personToAdd = { ...body, id: id };
 
